@@ -1,75 +1,47 @@
-<!-- Please update value in the {}  -->
+# Team Manager
 
-<h1 align="center">{Your project name}</h1>
+Aplicación multiplataforma (web, móvil y tablet) para la gestión de equipos: tareas asignadas, fichajes y documentación.
 
-<div align="center">
-   Solution for a challenge from  <a href="http://devchallenges.io" target="_blank">Devchallenges.io</a>.
-</div>
+## Stack
 
-<div align="center">
-  <h3>
-    <a href="https://{your-demo-link.your-domain}">
-      Demo
-    </a>
-    <span> | </span>
-    <a href="https://{your-url-to-the-solution}">
-      Solution
-    </a>
-    <span> | </span>
-    <a href="https://devchallenges.io/challenges/wBunSb7FPrIepJZAg0sY">
-      Challenge
-    </a>
-  </h3>
-</div>
+- **Expo (React Native)** — una sola base de código para iOS, Android y web.
+- **Supabase** — autenticación, base de datos Postgres y almacenamiento de archivos.
 
-<!-- TABLE OF CONTENTS -->
+## Funcionalidades
 
-## Table of Contents
+- Gestión de equipos (crear equipo, unirse, ver miembros).
+- Tareas asignadas por equipo: los administradores/managers asignan tareas a un miembro concreto; cada miembro solo ve sus propias tareas. Al pulsar "Iniciar" empieza a correr el tiempo, y al pulsar "Finalizar" se suma el tiempo dedicado a la tarea.
+- Fichajes de entrada y salida con historial.
+- Gestión documental: subir, listar y descargar documentos por equipo.
 
-- [Overview](#overview)
-  - [Built With](#built-with)
-- [Features](#features)
-- [Contact](#contact)
-- [Acknowledgements](#acknowledgements)
+## Configuración
 
-<!-- OVERVIEW -->
+1. Crea un proyecto en [Supabase](https://supabase.com).
+2. Ejecuta el contenido de `supabase/schema.sql` en el SQL editor del proyecto.
+3. Crea un bucket de Storage llamado `documents` (puede ser privado).
+4. Copia `.env.example` a `.env` y rellena `EXPO_PUBLIC_SUPABASE_URL` y `EXPO_PUBLIC_SUPABASE_ANON_KEY` con los valores de tu proyecto.
+5. Instala dependencias:
 
-## Overview
+   ```bash
+   npm install
+   ```
 
-![screenshot](https://user-images.githubusercontent.com/16707738/92399059-5716eb00-f132-11ea-8b14-bcacdc8ec97b.png)
+6. Arranca la app:
 
-Introduce your projects by taking a screenshot or a gif. Try to tell visitors a story about your project by answering:
+   ```bash
+   npm run start   # abre el menú de Expo (web / iOS / Android)
+   npm run web      # solo web
+   npm run ios      # solo iOS (requiere macOS/simulador)
+   npm run android  # solo Android (requiere emulador/dispositivo)
+   ```
 
-- Where can I see your demo?
-- What was your experience?
-- What have you learned/improved?
-- Your wisdom? :)
+## Estructura
 
-### Built With
-
-<!-- This section should list any major frameworks that you built your project using. Here are a few examples.-->
-
-- [React](https://reactjs.org/)
-- [Vue.js](https://vuejs.org/)
-- [Tailwind](https://tailwindcss.com/)
-
-## Features
-
-<!-- List the features of your application or follow the template. Don't share the figma file here :) -->
-
-This application/site was created as a submission to a [DevChallenges](https://devchallenges.io/challenges) challenge. The [challenge](https://devchallenges.io/challenges/wBunSb7FPrIepJZAg0sY) was to build an application to complete the given user stories.
-
-
-## Acknowledgements
-
-<!-- This section should list any articles or add-ons/plugins that helps you to complete the project. This is optional but it will help you in the future. For exmpale -->
-
-- [Steps to replicate a design with only HTML and CSS](https://devchallenges-blogs.web.app/how-to-replicate-design/)
-- [Node.js](https://nodejs.org/)
-- [Marked - a markdown parser](https://github.com/chjj/marked)
-
-## Contact
-
-- Website [your-website.com](https://{your-web-site-link})
-- GitHub [@your-username](https://{github.com/your-usermame})
-- Twitter [@your-twitter](https://{twitter.com/your-username})
+```
+App.tsx                     punto de entrada
+src/lib/supabase.ts          cliente de Supabase
+src/contexts/                contexto de sesión y de equipo activo
+src/screens/                 pantallas: Login, Equipos, Tareas, Fichajes, Documentos
+src/navigation/RootNavigator pestañas principales de la app
+supabase/schema.sql          esquema de base de datos y políticas RLS
+```
