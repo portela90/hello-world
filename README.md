@@ -10,7 +10,7 @@ Aplicación multiplataforma (web, móvil y tablet) para la gestión de equipos: 
 ## Funcionalidades
 
 - Gestión de equipos (crear equipo, unirse, ver miembros).
-- Tareas asignadas por equipo con estado (pendiente / en progreso / hecha).
+- Tareas asignadas por equipo: los administradores/managers asignan tareas a un miembro concreto; cada miembro solo ve sus propias tareas. Al pulsar "Iniciar" empieza a correr el tiempo, y al pulsar "Finalizar" se suma el tiempo dedicado a la tarea.
 - Fichajes de entrada y salida con historial.
 - Gestión documental: subir, listar y descargar documentos por equipo.
 

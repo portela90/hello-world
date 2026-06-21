@@ -33,6 +33,8 @@ create table tasks (
   created_by uuid references profiles(id),
   status text not null default 'pending' check (status in ('pending', 'in_progress', 'done')),
   due_date date,
+  started_at timestamptz,
+  accumulated_seconds integer not null default 0,
   created_at timestamptz not null default now()
 );
 
@@ -71,7 +73,36 @@ returns boolean language sql security definer as $$
   );
 $$;
 
-create policy "profiles_select_own" on profiles for select using (id = auth.uid());
+create or replace function is_team_manager(p_team_id uuid)
+returns boolean language sql security definer as $$
+  select exists (
+    select 1 from team_members
+    where team_id = p_team_id and user_id = auth.uid() and role in ('admin', 'manager')
+  );
+$$;
+
+-- Auto-create a profile row whenever a new auth user signs up
+create or replace function handle_new_user()
+returns trigger language plpgsql security definer as $$
+begin
+  insert into public.profiles (id, full_name, email)
+  values (new.id, new.raw_user_meta_data->>'full_name', new.email);
+  return new;
+end;
+$$;
+
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute procedure handle_new_user();
+
+create policy "profiles_select_own_or_teammate" on profiles for select using (
+  id = auth.uid()
+  or exists (
+    select 1 from team_members tm1
+    join team_members tm2 on tm1.team_id = tm2.team_id
+    where tm1.user_id = auth.uid() and tm2.user_id = profiles.id
+  )
+);
 create policy "profiles_update_own" on profiles for update using (id = auth.uid());
 create policy "profiles_insert_own" on profiles for insert with check (id = auth.uid());
 
@@ -84,9 +115,11 @@ create policy "team_members_insert_self_or_admin" on team_members for insert wit
 );
 
 create policy "tasks_select_member" on tasks for select using (is_team_member(team_id));
-create policy "tasks_insert_member" on tasks for insert with check (is_team_member(team_id));
-create policy "tasks_update_member" on tasks for update using (is_team_member(team_id));
-create policy "tasks_delete_member" on tasks for delete using (is_team_member(team_id));
+create policy "tasks_insert_manager" on tasks for insert with check (is_team_manager(team_id));
+create policy "tasks_update_assignee_or_manager" on tasks for update using (
+  assigned_to = auth.uid() or is_team_manager(team_id)
+);
+create policy "tasks_delete_manager" on tasks for delete using (is_team_manager(team_id));
 
 create policy "attendance_select_member" on attendance for select using (is_team_member(team_id));
 create policy "attendance_insert_self" on attendance for insert with check (user_id = auth.uid() and is_team_member(team_id));
